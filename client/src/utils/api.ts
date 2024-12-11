@@ -4,10 +4,10 @@ const API_ROUTES = {
     BASE: `${CFG_SERVER.url}:${CFG_SERVER.port}/api`
 }
 
-export const API_ROUTES_ADMIN = {
-    // GET_DATA: `${API_ROUTES.BASE}/admin/`,
-    LOGIN: `${API_ROUTES.BASE}/admin/login`,
-    GET_ME: `${API_ROUTES.BASE}/admin/me`
+export const API_ROUTES_USER = {
+    LOGIN: `${API_ROUTES.BASE}/user/login`,
+    GET_ME: `${API_ROUTES.BASE}/user/me`,
+    GET_CAMPAIGNS: `${API_ROUTES.BASE}/user/campaigns`,
 };
 
 // User data interface
@@ -57,5 +57,5 @@ export const authenticatedRequest = async (url: string, options: RequestInit = {
 
 // Get logged in user data from server
 export const fetchUserData = async (): Promise<UserData> => {
-    return authenticatedRequest(API_ROUTES_ADMIN.GET_USER);
+    return authenticatedRequest(API_ROUTES_USER.GET_ME);
 };

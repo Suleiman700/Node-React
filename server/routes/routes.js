@@ -1,9 +1,9 @@
 const express = require('express');
-const adminController = require('../services/admin/adminController')
+const userController = require('../services/user/userController')
 
 const router = express.Router();
 
 // User routes
-router.use('/api/admin', adminController);
+router.use('/api/user', userController);
 
 module.exports = router;

@@ -13,7 +13,7 @@ import {Iconify} from "../../components/iconify";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { API_ROUTES_ADMIN } from "../../utils/api";
+import { API_ROUTES_USER } from "../../utils/api";
 import { LocalStorage, LOCAL_STORAGE_KEYS } from "../../utils/LocalStorage";
 import RequestHandler from "../../utils/RequestHandler";
 
@@ -32,8 +32,15 @@ export default function Page() {
     const handleSignIn = useCallback(async () => {
         setLoading(true);
         setError('');
+
+        if (!email.length || !password.length) {
+            setLoading(false);
+            setError('Please enter email and password')
+            return;
+        }
+
         try {
-            const response = await RequestHandler.post(API_ROUTES_ADMIN.LOGIN, {
+            const response = await RequestHandler.post(API_ROUTES_USER.LOGIN, {
                 email,
                 password
             });
@@ -41,7 +48,7 @@ export default function Page() {
             if (response.status === 200) {
 
                 // Get logged in user's basic info
-                const userInfo = await RequestHandler.get(API_ROUTES_ADMIN.GET_ME);
+                const userInfo = await RequestHandler.get(API_ROUTES_USER.GET_ME);
                 if (userInfo.status === 200) {
                     LocalStorage.setItem(LOCAL_STORAGE_KEYS.USER.BASIC_INFO, JSON.stringify(userInfo.data));
                 }
@@ -115,7 +122,9 @@ export default function Page() {
                     >
                         Sign in
                     </LoadingButton>
-                    {error && <Typography color="error">{error}</Typography>}
+                    <div style={{textAlign: 'center', width: '100%'}}>
+                        {error && <Typography color="error">{error}</Typography>}
+                    </div>
                 </Box>
             </>
         </>

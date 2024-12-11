@@ -11,7 +11,7 @@ exports.login = async (req, res) => {
         const userData = {
             id: "user_id",
             name: "User Name",
-            role: "admin",
+            role: "user",
             email
         };
 

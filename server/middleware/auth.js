@@ -22,7 +22,7 @@ const authMiddleware = (req, res, next) => {
         // Make sure your token includes role when signing
         req.user = {
             id: decoded.id,
-            role: decoded.role // This will be 1 for admin, 2 for owner, 3 for user
+            role: decoded.role // This will be 1 for user, 2 for owner, 3 for user
         };
         
         next();

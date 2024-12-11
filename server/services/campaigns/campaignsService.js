@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config');
 
 /**
- * Sign admin login token
+ * Sign user login token
  * @param _Admin {AdminModel}
  * @return {object}
  */

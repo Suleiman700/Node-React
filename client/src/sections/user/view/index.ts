@@ -1,1 +1,1 @@
-export * from './user-view';
+export * from '../../campaign/view/user-view';
