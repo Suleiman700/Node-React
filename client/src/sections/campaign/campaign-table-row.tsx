@@ -29,10 +29,10 @@ export type CampaignProps = {
 type CampaignTableRowProps = {
     row: CampaignProps;
     selected: boolean;
-    onSelectRow: () => void;
+    onRowClickEdit: () => void;
 };
 
-export function CampaignTableRow({row, selected, onSelectRow}: CampaignTableRowProps) {
+export function CampaignTableRow({row, selected, onRowClickEdit}: CampaignTableRowProps) {
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
     const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -41,6 +41,11 @@ export function CampaignTableRow({row, selected, onSelectRow}: CampaignTableRowP
 
     const handleClosePopover = useCallback(() => {
         setOpenPopover(null);
+    }, []);
+
+    const handleRowEdit = useCallback((id: string) => {
+        console.log(`Editing campaign with ID: ${id}`);
+        onRowClickEdit(id);
     }, []);
 
     return (
@@ -54,8 +59,13 @@ export function CampaignTableRow({row, selected, onSelectRow}: CampaignTableRowP
                 </TableCell>
 
                 <TableCell>
+                    {row.description}
+                </TableCell>
+
+                <TableCell>
                     {row.token}
                 </TableCell>
+
                 <TableCell>
                     {fDateTime(row.created_at)}
                 </TableCell>
@@ -94,7 +104,7 @@ export function CampaignTableRow({row, selected, onSelectRow}: CampaignTableRowP
                         },
                     }}
                 >
-                    <MenuItem onClick={handleClosePopover}>
+                    <MenuItem onClick={() => handleRowEdit(row.id)}>
                         <Iconify icon="solar:pen-bold"/>
                         Edit
                     </MenuItem>

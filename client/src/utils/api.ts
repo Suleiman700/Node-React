@@ -8,6 +8,12 @@ export const API_ROUTES_USER = {
     LOGIN: `${API_ROUTES.BASE}/user/login`,
     GET_ME: `${API_ROUTES.BASE}/user/me`,
     GET_CAMPAIGNS: `${API_ROUTES.BASE}/user/campaigns`,
+    GET_CAMPAIGN: `${API_ROUTES.BASE}/user/campaign`,
+};
+
+export const API_ROUTES_CAMPAIGNS = {
+    CAMPAIGNS: `${API_ROUTES.BASE}/campaigns`,
+    EDIT: `${API_ROUTES.BASE}/campaigns/edit`,
 };
 
 // User data interface

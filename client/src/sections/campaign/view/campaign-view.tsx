@@ -1,17 +1,18 @@
 import {useState, useCallback, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import {_users} from 'src/_mock';
-import {DashboardContent} from 'src/layouts/dashboard';
-
+import {paths} from 'src/routes/paths';
+import {UserService} from 'src/services/UserService';
 import {Iconify} from 'src/components/iconify';
 import {Scrollbar} from 'src/components/scrollbar';
 
@@ -22,191 +23,138 @@ import {TableEmptyRows} from '../../user/table-empty-rows';
 import {CampaignTableToolbar} from "../campaign-table-toolbar";
 import {emptyRows, applyFilter, getComparator} from '../../user/utils';
 
-import type {UserProps} from '../../user/user-table-row';
-import {UserService} from "../../../services/UserService";
-
 // ----------------------------------------------------------------------
 
 export function CampaignView() {
-    const table = useTable();
+    const navigate = useNavigate();
     const [campaigns, setCampaigns] = useState([]);
-
     const [filterName, setFilterName] = useState('');
+    const [page, setPage] = useState(0);
+    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+    const [orderBy, setOrderBy] = useState('name');
+    const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    const dataFiltered: UserProps[] = applyFilter({
+    useEffect(() => {
+        loadCampaigns();
+    }, []);
+
+    const loadCampaigns = async () => {
+        try {
+            const response = await UserService.getCampaigns();
+            if (response.status === 200) {
+                setCampaigns(response.data);
+            }
+        } catch (error) {
+            console.error('Error loading campaigns:', error);
+        }
+    };
+
+    const handleSort = useCallback((id: string) => {
+        const isAsc = orderBy === id && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(id);
+    }, [order, orderBy]);
+
+    const handleChangePage = useCallback((event: unknown, newPage: number) => {
+        setPage(newPage);
+    }, []);
+
+    const handleChangeRowsPerPage = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setPage(0);
+        setRowsPerPage(parseInt(event.target.value, 10));
+    }, []);
+
+    const handleFilterByName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setPage(0);
+        setFilterName(event.target.value);
+    }, []);
+
+    const handleEditRow = (id: string) => {
+        navigate(paths.campaigns.edit(id));
+    };
+
+    const handleCreateCampaign = () => {
+        navigate(paths.campaigns.new);
+    };
+
+    const dataFiltered = applyFilter({
         inputData: campaigns,
-        comparator: getComparator(table.order, table.orderBy),
+        comparator: getComparator(order, orderBy),
         filterName,
     });
 
     const notFound = !dataFiltered.length && !!filterName;
 
-    useEffect(() => {
-        async function getCampaigns() {
-            const campaigns = await UserService.getCampaigns();
-            if (campaigns.status === 200 && campaigns.data.length) {
-                setCampaigns(campaigns.data);
-            } else {
-                setCampaigns([]);
-            }
-        }
-
-        getCampaigns();
-    }, []); // Remove `campaigns` and `setCampaigns` from the dependency array
-
-
     return (
-        <DashboardContent>
-            <Box display="flex" alignItems="center" mb={5}>
-                <Typography variant="h4" flexGrow={1}>
-                    Campaigns
-                </Typography>
+        <Container>
+            <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="h4">Campaigns</Typography>
+
                 <Button
                     variant="contained"
-                    color="inherit"
-                    startIcon={<Iconify icon="mingcute:add-line"/>}
+                    startIcon={<Iconify icon="eva:plus-fill" />}
+                    onClick={handleCreateCampaign}
                 >
-                    New campaign
+                    New Campaign
                 </Button>
             </Box>
 
             <Card>
                 <CampaignTableToolbar
-                    numSelected={table.selected.length}
                     filterName={filterName}
-                    onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setFilterName(event.target.value);
-                        table.onResetPage();
-                    }}
+                    onFilterName={handleFilterByName}
                 />
 
                 <Scrollbar>
-                    <TableContainer sx={{overflow: 'unset'}}>
-                        <Table sx={{minWidth: 800}}>
+                    <TableContainer sx={{ overflow: 'unset' }}>
+                        <Table sx={{ minWidth: 800 }}>
                             <CampaignTableHead
-                                order={table.order}
-                                orderBy={table.orderBy}
-                                rowCount={_users.length}
-                                numSelected={table.selected.length}
-                                onSort={table.onSort}
-                                onSelectAllRows={(checked) =>
-                                    table.onSelectAllRows(
-                                        checked,
-                                        _users.map((user) => user.id)
-                                    )
-                                }
+                                order={order}
+                                orderBy={orderBy}
+                                onRequestSort={handleSort}
                                 headLabel={[
-                                    {id: 'name', label: 'Name'},
-                                    {id: 'token', label: 'Token'},
-                                    {id: 'created_at', label: 'Created At'},
-                                    {id: 'active', label: 'Active'},
-                                    {id: ''},
+                                    { id: 'name', label: 'Name' },
+                                    { id: 'description', label: 'Description' },
+                                    { id: 'token', label: 'Token' },
+                                    { id: 'created_at', label: 'Created At' },
+                                    { id: 'active', label: 'Active' },
+                                    { id: '', label: '' },
                                 ]}
                             />
+
                             <TableBody>
                                 {dataFiltered
-                                    .slice(
-                                        table.page * table.rowsPerPage,
-                                        table.page * table.rowsPerPage + table.rowsPerPage
-                                    )
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => (
                                         <CampaignTableRow
                                             key={row.id}
                                             row={row}
-                                            selected={table.selected.includes(row.id)}
-                                            onSelectRow={() => table.onSelectRow(row.id)}
+                                            selected={false}
+                                            onRowClickEdit={() => handleEditRow(row.id)}
                                         />
                                     ))}
 
                                 <TableEmptyRows
-                                    height={68}
-                                    emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
+                                    height={77}
+                                    emptyRows={emptyRows(page, rowsPerPage, dataFiltered.length)}
                                 />
 
-                                {notFound && <TableNoData searchQuery={filterName}/>}
+                                {notFound && <TableNoData query={filterName} />}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Scrollbar>
 
                 <TablePagination
+                    page={page}
                     component="div"
-                    page={table.page}
-                    count={_users.length}
-                    rowsPerPage={table.rowsPerPage}
-                    onPageChange={table.onChangePage}
+                    count={dataFiltered.length}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={handleChangePage}
                     rowsPerPageOptions={[5, 10, 25]}
-                    onRowsPerPageChange={table.onChangeRowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Card>
-        </DashboardContent>
+        </Container>
     );
-}
-
-// ----------------------------------------------------------------------
-
-export function useTable() {
-    const [page, setPage] = useState(0);
-    const [orderBy, setOrderBy] = useState('name');
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [selected, setSelected] = useState<string[]>([]);
-    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-
-    const onSort = useCallback(
-        (id: string) => {
-            const isAsc = orderBy === id && order === 'asc';
-            setOrder(isAsc ? 'desc' : 'asc');
-            setOrderBy(id);
-        },
-        [order, orderBy]
-    );
-
-    const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
-        if (checked) {
-            setSelected(newSelecteds);
-            return;
-        }
-        setSelected([]);
-    }, []);
-
-    const onSelectRow = useCallback(
-        (inputValue: string) => {
-            const newSelected = selected.includes(inputValue)
-                ? selected.filter((value) => value !== inputValue)
-                : [...selected, inputValue];
-
-            setSelected(newSelected);
-        },
-        [selected]
-    );
-
-    const onResetPage = useCallback(() => {
-        setPage(0);
-    }, []);
-
-    const onChangePage = useCallback((event: unknown, newPage: number) => {
-        setPage(newPage);
-    }, []);
-
-    const onChangeRowsPerPage = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            setRowsPerPage(parseInt(event.target.value, 10));
-            onResetPage();
-        },
-        [onResetPage]
-    );
-
-    return {
-        page,
-        order,
-        onSort,
-        orderBy,
-        selected,
-        rowsPerPage,
-        onSelectRow,
-        onResetPage,
-        onChangePage,
-        onSelectAllRows,
-        onChangeRowsPerPage,
-    };
 }

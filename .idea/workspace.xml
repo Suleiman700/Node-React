@@ -5,41 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7800d819-ef25-43a6-a115-b66f8ad92c61" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/public/assets/icons/campaign.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/public/assets/icons/marketing.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/pages/campaigns.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/pages/sign-in2.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-head.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-row.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-toolbar.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/sections/campaign/utils.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-view.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/services/AuthService.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/routes/paths.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/services/CampaignService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/config-global.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/config-global.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/layouts/components/account-popover.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/layouts/components/account-popover.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/layouts/config-nav-dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/layouts/config-nav-dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/sign-in.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/sign-in.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/home.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/sign-in.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/sign-in.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/routes/sections.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/routes/sections.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/sections/overview/view/overview-analytics-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/overview/view/overview-analytics-view.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/sections/user/view/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/user/view/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/sections/user/view/user-view.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-row.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-row.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/services/UserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/UserService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/utils/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/utils/api.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/client/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/adminController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/adminController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/middleware/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/middleware/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/admin_routes/admin_routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/UserService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/routes/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/admin/adminController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/admin/adminModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsModel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/admin/adminService.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/campaigns/campaignsController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/campaigns/campaignsModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsModel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/services/user/userController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/user/userController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/user/userModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/user/userModel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/user/userService.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/user/userService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +62,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.editor",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "ts.external.directory.path": "E:\\GitHub\\Node-React\\client\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -117,6 +98,7 @@
       <workItem from="1733950601657" duration="18000" />
       <workItem from="1733950652294" duration="69000" />
       <workItem from="1733950730403" duration="5590000" />
+      <workItem from="1734016411228" duration="6496000" />
     </task>
     <servers />
   </component>

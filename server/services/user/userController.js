@@ -76,23 +76,4 @@ router.get('/me', authenticateToken, async (req, res) => {
     }
 })
 
-router.get('/campaigns', authenticateToken, async (req, res) => {
-
-    const token = req.headers['authorization'].split(' ')[1];
-    const userId = jwtDecode.jwtDecode(token).id;
-
-    try {
-        const records = await CampaignsModel.findByKeyValue('user_id', userId);
-        if (records != null) {
-            res.json(records);
-        }
-        else {
-            res.status(404).json({message: 'No records found'});
-        }
-    }
-    catch (error) {
-        res.status(500).json({state: false, error: error.message});
-    }
-})
-
 module.exports = router;

@@ -7,6 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import ProtectedRoute from 'src/components/auth/ProtectedRoute';
 
 // ----------------------------------------------------------------------
 
@@ -14,6 +15,7 @@ export const HomePage = lazy(() => import('src/pages/home'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const CampaignsPage = lazy(() => import('src/pages/campaigns'));
+export const CampaignFormPage = lazy(() => import('src/pages/campaign-form'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const AdminSignInPage = lazy(() => import('src/pages/admin/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
@@ -36,38 +38,49 @@ const renderFallback = (
 
 export function Router() {
   return useRoutes([
+    // Auth routes
+    {
+      path: 'sign-in',
+      element: (
+        <AuthLayout>
+          <Suspense fallback={renderFallback}>
+            <SignInPage />
+          </Suspense>
+        </AuthLayout>
+      ),
+    },
+    {
+      path: 'admin/sign-in',
+      element: (
+        <AuthLayout>
+          <Suspense fallback={renderFallback}>
+            <AdminSignInPage />
+          </Suspense>
+        </AuthLayout>
+      ),
+    },
+    // Protected routes
     {
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <ProtectedRoute>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </ProtectedRoute>
       ),
       children: [
         { element: <HomePage />, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'campaigns', element: <CampaignsPage /> },
+        { path: 'campaigns/new', element: <CampaignFormPage /> },
+        { path: 'campaigns/edit/:id', element: <CampaignFormPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
       ],
     },
-    {
-      path: 'sign-in',
-      element: (
-        <AuthLayout>
-          <SignInPage />
-        </AuthLayout>
-      ),
-    },
-    {
-      path: 'user/sign-in',
-      element: (
-        <AuthLayout>
-          <AdminSignInPage />
-        </AuthLayout>
-      ),
-    },
+    // Catch all route
     {
       path: '404',
       element: <Page404 />,

@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const UserModel = require('./campaignsModel');
+const CampaignsModel = require('./campaignsModel');
 const config = require('../../config');
-const Hash = require('../../utils/Hash');
-const { signLoginToken } = require('./userService');
 const {verify} = require('jsonwebtoken');
-// const {adminOnly} = require('../../middleware/roleAuth');
 const jwtDecode = require('jwt-decode');
 
 // const {adminOnly} = require('../../middleware/roleAuth');
@@ -28,46 +25,18 @@ function authenticateToken(req, res, next) {
     })
 }
 
-
-// POST login
-router.post('/login', async (req, res) => {
-    const {email, password} = req.body;
-    try {
-        const User = await UserModel.findByEmail(email);
-        if (User['id'] && await Hash.validateHash(password, User['password'])) {
-            // Sign login token
-            const loginToken = await signLoginToken(User);
-
-            res.json({
-                message: 'Login successful',
-                token: loginToken,
-            });
-        }
-        else {
-            res.status(401).json({message: 'Invalid email or password'});
-        }
-    }
-    catch (error) {
-        res.status(500).json({state: false, error: error.message});
-    }
-});
-
-router.get('/me', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
 
     const token = req.headers['authorization'].split(' ')[1];
     const userId = jwtDecode.jwtDecode(token).id;
 
     try {
-        const User = await UserModel.findByKeyValue('id', userId);
-        if (User != null) {
-            res.json({
-                id: User.id,
-                name: User.name,
-                email: User.email,
-            });
+        const records = await CampaignsModel.findByKeyValue('user_id', userId);
+        if (records != null) {
+            res.json(records);
         }
         else {
-            res.status(404).json({message: 'No user found'});
+            res.status(404).json({message: 'No records found'});
         }
     }
     catch (error) {
@@ -75,22 +44,58 @@ router.get('/me', authenticateToken, async (req, res) => {
     }
 })
 
-router.get('/campaigns', authenticateToken, async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
 
     const token = req.headers['authorization'].split(' ')[1];
     const userId = jwtDecode.jwtDecode(token).id;
 
+    const campaignId = req.params.id;
+
     try {
-        const User = await UserModel.findByKeyValue('id', userId);
-        if (User != null) {
-            res.json({
-                id: User.id,
-                name: User.name,
-                email: User.email,
-            });
+        const Campaign = await CampaignsModel.getCampaignByIdAndUser(campaignId, userId);
+        if (Campaign != null) {
+            res.json(Campaign);
         }
         else {
-            res.status(404).json({message: 'No user found'});
+            res.status(404).json({message: 'No records found'});
+        }
+    }
+    catch (error) {
+        res.status(500).json({state: false, error: error.message});
+    }
+})
+
+router.post('/edit/:id', authenticateToken, async (req, res) => {
+
+    const token = req.headers['authorization'].split(' ')[1];
+    const userId = jwtDecode.jwtDecode(token).id;
+
+    const campaignId = req.params.id;
+
+
+    try {
+        // Get campaign data
+        let campaignData = await CampaignsModel.findByKeyValue('id', campaignId);
+        if (campaignData == null) {
+            res.status(404).json({message: 'No records found'});
+        }
+        campaignData = campaignData[0];
+
+        // Check if user owns this campaign
+        if (campaignData.id != userId) {
+            res.status(401).json({message: 'You dont own this campaign'});
+            return;
+        }
+
+        // Get passed new campaign data
+        const passedCampaignData = req.body;
+
+        const Campaign = await CampaignsModel.update(campaignData.id, passedCampaignData);
+        if (Campaign != null) {
+            res.json(Campaign);
+        }
+        else {
+            res.status(404).json({message: 'No records found'});
         }
     }
     catch (error) {
