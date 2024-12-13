@@ -95,6 +95,21 @@ class LeadModel {
             throw null;
         }
     }
+
+    /**
+     * Delete lead by ID and user ID
+     * @param _id {number} - The lead id
+     * @param _userId {number} - The user id
+     * @returns {Promise<boolean>} - Returns true if read was deleted, false if lead was not found
+     */
+    static async delete(_id, _userId) {
+        const [result] = await Database.connection().query(
+            `DELETE FROM ${LeadModel.table} WHERE id = ? AND user_id = ?`,
+            [_id, _userId]
+        );
+
+        return result.affectedRows > 0;
+    }
 }
 
 module.exports = LeadModel;

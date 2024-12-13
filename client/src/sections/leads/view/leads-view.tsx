@@ -27,6 +27,7 @@ import {TableEmptyRows} from '../../user/table-empty-rows';
 import {LeadsTableToolbar} from "../leads-table-toolbar";
 import {emptyRows, applyFilter, getComparator} from '../utils';
 import {CampaignService} from "../../../services/CampaignService";
+import {LeadService} from "../../../services/LeadService";
 
 // ----------------------------------------------------------------------
 
@@ -124,7 +125,7 @@ export function LeadsView() {
             });
 
             if (result.isConfirmed) {
-                const response = await CampaignService.delete(_id);
+                const response = await LeadService.delete(_id);
                 
                 if (response && response.status === 200) {
                     setLeads(prevCampaigns => 
@@ -133,7 +134,7 @@ export function LeadsView() {
 
                     await Swal.fire({
                         title: 'Deleted!',
-                        text: 'Campaign has been deleted.',
+                        text: 'Lead has been deleted.',
                         icon: 'success',
                         timer: 1500,
                         showConfirmButton: false,
@@ -144,7 +145,7 @@ export function LeadsView() {
                     });
                 }
                 else {
-                    throw new Error('Failed to delete campaign');
+                    throw new Error('Failed to delete lead');
                 }
             }
         }

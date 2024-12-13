@@ -8,6 +8,7 @@ const CampaignService = require('./CampaignService');
 const UserModel = require('../user/userModel');
 const LeadModel = require('../lead/LeadModel');
 const UserCampaignPlatformsModel = require('../user_campaign_platforms/UserCampaignPlatformsModel');
+const Logger = require("../../utils/logger");
 
 // const {adminOnly} = require('../../middleware/roleAuth');
 
@@ -194,54 +195,77 @@ router.post('/delete/:id', authenticateToken, async (req, res) => {
 })
 
 router.post('/webhook/:token', async (req, res) => {
+    try {
+        // Log the incoming request with a unique emoji
+        await Logger.logWebhook(req, '📡 Webhook received');
 
-    const token = req.params.token;
-    const leadData = req.body;
+        const token = req.params.token;
+        const leadData = req.body;
 
-    // Decode token
-    const decodedToken = CampaignService.decodeToken(token);
-    if (!decodedToken.isValid) {
-        res.status(403).json({ message: 'Bad token' });
-        return;
+        if (!token) {
+            // Log error with a red circle emoji
+            await Logger.logWebhook(req, '❌ Error', new Error('No token provided'));
+            return res.status(400).json({ message: 'No token provided' });
+        }
+
+        // Decode token
+        const decodedToken = CampaignService.decodeToken(token);
+        if (!decodedToken.isValid) {
+            // Log error with a red circle emoji
+            await Logger.logWebhook(req, '❌ Error', new Error('Bad token'));
+            res.status(403).json({ message: 'Bad token' });
+            return;
+        }
+
+        // Get user id from token
+        const tokenUserId = decodedToken.userId;
+
+        // Check if a user exists with that id
+        const userFound = await UserModel.findByKeyValue('id', tokenUserId);
+
+        if (userFound == null) {
+            // Log error with a red circle emoji
+            await Logger.logWebhook(req, '❌ Error', new Error('User cannot be found'));
+            return res.status(403).json({ message: 'User cannot be found' });
+        }
+
+        // Get the campaign by user_id and token
+        const campaignData = await CampaignsModel.findByKeyValue('token', token);
+        if (campaignData == null) {
+            // Log error with a red circle emoji
+            await Logger.logWebhook(req, '❌ Error', new Error('Campaign not found'));
+            return res.status(404).json({ message: 'Campaign not found' });
+        }
+
+        const campaignId = campaignData[0].id;
+
+        const leadToCreate = {
+            userId: tokenUserId,
+            campaignId: campaignId,
+            data: leadData,
+        };
+
+        const leadCreateResult = await LeadModel.create(leadToCreate);
+
+        if (!leadCreateResult) {
+            // Log error with a red circle emoji
+            await Logger.logWebhook(req, '❌ Error', new Error('Failed to create lead'));
+            return res.status(500).json({ message: 'Failed to create lead' });
+        }
+
+        // Log successful request with a success emoji
+        await Logger.logWebhook(req, '✅ Webhook processed successfully');
+
+        // Respond to the webhook
+        res.status(200).json({ message: 'Webhook processed successfully' });
+    } catch (error) {
+        // Log error with a red circle emoji
+        await Logger.logWebhook(req, '❌ Error', error);
+        res.status(500).json({ state: false, error: error.message });
+    } finally {
+        // End log with a closing emoji
+        await Logger.logWebhook(req, '🔚 Webhook processing completed');
     }
-
-    // Get user id from token
-    const tokenUserId = decodedToken.userId;
-
-    // Check if a user exists with that id
-    const userFound = await UserModel.findByKeyValue('id', tokenUserId);
-
-    if (userFound == null) {
-        res.status(403).json({ message: 'User cannot be found' });
-        return
-    }
-
-    // Get the campaign by user_id and token
-    const campaignData = await CampaignsModel.findByKeyValue('token', token);
-    if (campaignData == null) {
-        res.status(403).json({ message: 'Campaign cannot be found' });
-        return
-    }
-    const campaignId = campaignData[0].id;
-
-    const leadToCreate = {
-        userId: tokenUserId,
-        campaignId: campaignId,
-        data: leadData,
-    };
-    const leadCreateResult = LeadModel.create(leadToCreate);
-    console.log(leadCreateResult)
-
-    // // Log the webhook data
-    // console.log('=== Wix Webhook Received ===');
-    // console.log('Token:', req.params.token);
-    // console.log('Body:', JSON.stringify(req.body, null, 2));
-    // console.log('Headers:', {
-    //     'x-wix-webhook-id': req.header('x-wix-webhook-id'),
-    //     'x-wix-event-type': req.header('x-wix-event-type')
-    // });
-    //
-    res.status(200).json({ message: 'Webhook processed successfully' });
-})
+});
 
 module.exports = router;

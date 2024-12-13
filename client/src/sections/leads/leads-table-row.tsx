@@ -249,10 +249,10 @@ export function LeadsTableRow({row, index, selected, onSelect, onRowClickEdit, o
                         },
                     }}
                 >
-                    <MenuItem onClick={() => handleRowEdit(row.id)}>
-                        <Iconify icon="solar:pen-bold"/>
-                        Edit
-                    </MenuItem>
+                    {/*<MenuItem onClick={() => handleRowEdit(row.id)}>*/}
+                    {/*    <Iconify icon="solar:pen-bold"/>*/}
+                    {/*    Edit*/}
+                    {/*</MenuItem>*/}
 
                     <MenuItem onClick={() => onRowClickDelete(row.id)} sx={{color: 'error.main'}}>
                         <Iconify icon="solar:trash-bin-trash-bold"/>
