@@ -10,6 +10,8 @@ import { ThemeProvider } from 'src/theme/theme-provider';
 
 import { Iconify } from 'src/components/iconify';
 
+import 'src/assets/styles/sweetalert.css';
+
 // ----------------------------------------------------------------------
 
 export default function App() {

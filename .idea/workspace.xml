@@ -5,22 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7800d819-ef25-43a6-a115-b66f8ad92c61" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/src/routes/paths.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/services/CampaignService.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/lead/LeadModel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/home.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/routes/sections.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/routes/sections.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/sections/campaign/campaign-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/campaign/campaign-form.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-row.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/campaign/campaign-table-row.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-form-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-form-view.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/sections/campaign/view/campaign-view.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/services/UserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/UserService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/services/CampaignService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/CampaignService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/utils/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/utils/api.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/client/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/services/campaigns/campaignsController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsController.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/services/campaigns/campaignsModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/campaignsModel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/user/userController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/user/userController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/campaigns/campaignsService.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/campaigns/CampaignService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +58,9 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "E:/GitHub/Node-React/client/src/services",
+    "javascript.nodejs.core.library.configured.version": "20.15.1",
+    "javascript.nodejs.core.library.typings.version": "20.15.0",
+    "last_opened_file_path": "E:/GitHub/Node-React/server/services/leads",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -69,11 +73,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\GitHub\Node-React\server\services\leads" />
       <recent name="E:\GitHub\Node-React\client\src\services" />
       <recent name="E:\GitHub\Node-React\client\public\assets\icons" />
       <recent name="E:\GitHub\Node-React\client\src\sections\campaign" />
       <recent name="E:\GitHub\Node-React\client\src\sections\campaigns" />
-      <recent name="E:\GitHub\Node-React\server\services" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\GitHub\Node-React\client\src\sections\campaign\view" />
@@ -98,7 +102,7 @@
       <workItem from="1733950601657" duration="18000" />
       <workItem from="1733950652294" duration="69000" />
       <workItem from="1733950730403" duration="5590000" />
-      <workItem from="1734016411228" duration="6496000" />
+      <workItem from="1734016411228" duration="13326000" />
     </task>
     <servers />
   </component>

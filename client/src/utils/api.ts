@@ -14,6 +14,8 @@ export const API_ROUTES_USER = {
 export const API_ROUTES_CAMPAIGNS = {
     CAMPAIGNS: `${API_ROUTES.BASE}/campaigns`,
     EDIT: `${API_ROUTES.BASE}/campaigns/edit`,
+    CREATE: `${API_ROUTES.BASE}/campaigns/create`,
+    DELETE: `${API_ROUTES.BASE}/campaigns/delete`,
 };
 
 // User data interface

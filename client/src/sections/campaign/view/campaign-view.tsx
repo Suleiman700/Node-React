@@ -1,6 +1,8 @@
 import {useState, useCallback, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import Swal from 'sweetalert2';
+
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -22,6 +24,7 @@ import {CampaignTableHead} from "../campaign-table-head";
 import {TableEmptyRows} from '../../user/table-empty-rows';
 import {CampaignTableToolbar} from "../campaign-table-toolbar";
 import {emptyRows, applyFilter, getComparator} from '../../user/utils';
+import {CampaignService} from "../../../services/CampaignService";
 
 // ----------------------------------------------------------------------
 
@@ -42,10 +45,11 @@ export function CampaignView() {
         try {
             const response = await UserService.getCampaigns();
             if (response.status === 200) {
-                setCampaigns(response.data);
+                setCampaigns(response.data || []);  
             }
         } catch (error) {
             console.error('Error loading campaigns:', error);
+            setCampaigns([]); 
         }
     };
 
@@ -75,6 +79,57 @@ export function CampaignView() {
 
     const handleCreateCampaign = () => {
         navigate(paths.campaigns.new);
+    };
+
+    const handleDeleteRow = async (_id: number) => {
+        try {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+            });
+
+            if (result.isConfirmed) {
+                const response = await CampaignService.delete(_id);
+                
+                if (response && response.status === 200) {
+                    setCampaigns(prevCampaigns => 
+                        prevCampaigns.filter(campaign => campaign.id !== _id)
+                    );
+
+                    await Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Campaign has been deleted.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal2-popup',
+                            title: 'swal2-title'
+                        }
+                    });
+                }
+                else {
+                    throw new Error('Failed to delete campaign');
+                }
+            }
+        }
+        catch (error) {
+            console.error('Error deleting campaign:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to delete campaign. Please try again.',
+                icon: 'error',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title'
+                }
+            });
+        }
     };
 
     const dataFiltered = applyFilter({
@@ -114,6 +169,7 @@ export function CampaignView() {
                                 onRequestSort={handleSort}
                                 headLabel={[
                                     { id: 'name', label: 'Name' },
+                                    { id: 'platform', label: 'Platform' },
                                     { id: 'description', label: 'Description' },
                                     { id: 'token', label: 'Token' },
                                     { id: 'created_at', label: 'Created At' },
@@ -131,6 +187,7 @@ export function CampaignView() {
                                             row={row}
                                             selected={false}
                                             onRowClickEdit={() => handleEditRow(row.id)}
+                                            onRowClickDelete={() => handleDeleteRow(row.id)}
                                         />
                                     ))}
 

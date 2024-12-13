@@ -2,19 +2,23 @@ import * as Yup from 'yup';
 import { ReactNode, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Swal from 'sweetalert2';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
+import FormHelperText from '@mui/material/FormHelperText';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { CampaignService } from "../../services/CampaignService";
-
 import RHFTextField from "src/components/hook-form/RHFTextField";
 import FormProvider from 'src/components/hook-form/form-provider';
 import Select from "@mui/material/Select";
+
+// import 'src/assets/styles/sweetalert.css';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +36,7 @@ type Props = {
 };
 
 export function CampaignForm({ campaign, onSubmit, loading }: Props) {
-    const [infoMessage, setInfoMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null); // Custom state for info messages
+    const [infoMessage, setInfoMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     const methods = useForm({
         resolver: yupResolver(Schema),
@@ -43,48 +47,93 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
         handleSubmit,
         control,
         formState: { isSubmitting },
-        watch, // Watch form fields for changes
+        watch,
     } = methods;
 
-    // Watch all form fields and reset infoMessage when any field changes
     useEffect(() => {
         const subscription = watch(() => {
-            if (infoMessage) setInfoMessage(null); // Clear infoMessage when any field is edited
+            if (infoMessage) setInfoMessage(null);
         });
 
-        return () => subscription.unsubscribe(); // Cleanup subscription
+        return () => subscription.unsubscribe();
     }, [watch, infoMessage]);
 
     useEffect(() => {
-        reset(campaign || {}); // Dynamically reset based on provided data
+        reset(campaign || {});
     }, [campaign, reset]);
 
     const onSubmitForm = handleSubmit(async (data) => {
         try {
-            const result = await CampaignService.edit(campaign.id, data);
-
-            if (result.status === 200) {
-                // Success message
-                setInfoMessage({
-                    type: 'success',
-                    message: 'Campaign updated successfully!',
-                });
-            } else if (result.status !== 200) {
-                // Handle field-specific errors
-                if (result.data?.message) {
+            if (campaign) {
+                const result = await CampaignService.edit(campaign.id, data);
+                if (result.status === 200) {
+                    setInfoMessage({
+                        type: 'success',
+                        message: 'Campaign updated successfully!',
+                    });
+                } else if (result.status !== 200) {
                     setInfoMessage({
                         type: 'error',
-                        message: result.data.message as string,
+                        message: result.data?.message || 'An error occurred while saving changes.',
+                    });
+                }
+            } else {
+                const createResult = await CampaignService.create(data);
+                if (createResult.status === 201) {
+                    await Swal.fire({
+                        title: 'Campaign Created Successfully!',
+                        html: `
+                            <p>Your campaign token is:</p>
+                            <div class="token-box">
+                                <code class="token-text">${createResult.data.token}</code>
+                            </div>
+                            <p class="info-text">
+                                You can use this token in your webhook
+                            </p>
+                        `,
+                        icon: 'success',
+                        confirmButtonText: 'Copy Token',
+                        showCancelButton: true,
+                        cancelButtonText: 'Close',
+                        allowOutsideClick: false,
+                        customClass: {
+                            popup: 'swal2-popup',
+                            title: 'swal2-title',
+                            htmlContainer: 'swal2-html-container',
+                            confirmButton: 'swal2-confirm',
+                            cancelButton: 'swal2-cancel'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigator.clipboard.writeText(createResult.data.token);
+                            Swal.fire({
+                                title: 'Token Copied!',
+                                text: 'The token has been copied to your clipboard.',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'swal2-popup',
+                                    title: 'swal2-title'
+                                }
+                            });
+                        }
+                    });
+
+                    reset(campaign || {});
+                    setInfoMessage({
+                        type: 'success',
+                        message: 'Campaign created successfully!',
                     });
                 } else {
-                    // General error
                     setInfoMessage({
                         type: 'error',
-                        message: 'An error occurred while saving changes.',
+                        message: createResult.data?.message || 'An error occurred while saving changes.',
                     });
                 }
             }
         } catch (error) {
+            console.log(error);
             setInfoMessage({
                 type: 'error',
                 message: 'Unexpected error occurred. Please try again later.',
@@ -94,12 +143,11 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
 
     useEffect(() => {
         if (infoMessage) {
-            // Automatically dismiss infoMessage after 3 seconds
             const timer = setTimeout(() => {
                 setInfoMessage(null);
             }, 3000);
 
-            return () => clearTimeout(timer); // Clear the timer if component is unmounted or infoMessage changes
+            return () => clearTimeout(timer);
         }
     }, [infoMessage]);
 
@@ -107,12 +155,23 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
         <FormProvider methods={methods} onSubmit={onSubmitForm}>
             <Stack spacing={3}>
                 <RHFTextField name="name" label="Campaign Name" />
-                <RHFTextField name="token" label="Campaign Token" disabled={true} value={campaign? campaign.token:'Will be generated upon creating campaign'} />
+                <RHFTextField 
+                    name="token" 
+                    label="Campaign Token" 
+                    disabled={true} 
+                    value={campaign ? campaign.token : 'Will be generated upon creating campaign'} 
+                />
                 <RHFTextField name="description" label="Description" multiline rows={4} />
+                <Box>
+                    <RHFTextField name="platform" label="Campaign Platform" />
+                    <FormHelperText sx={{ px: 2, color: 'gray' }}>
+                        Campaign platform like Facebook, TikTok, Instagram, etc.
+                    </FormHelperText>
+                </Box>
                 <Controller
                     name="active"
                     control={control}
-                    defaultValue={campaign?.active || "1"} // Fallback to "1" if not provided
+                    defaultValue={campaign?.active || "1"}
                     render={({ field }) => (
                         <Select {...field} fullWidth>
                             <MenuItem value="1">Active</MenuItem>
@@ -121,33 +180,28 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
                     )}
                 />
 
-                {/* Display Info (Success/Error) Message */}
                 {infoMessage && (
                     <Box
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            p: 2, // Padding
-                            borderRadius: 1, // Rounded corners
+                            p: 2,
+                            borderRadius: 1,
                             backgroundColor: infoMessage.type === 'error' ? 'error.light' : 'success.light',
                             color: infoMessage.type === 'error' ? 'error.main' : 'success.main',
                             mb: 2,
-                            boxShadow: 2, // Subtle shadow to make the box stand out
+                            boxShadow: 2,
                         }}
                     >
-                        {/* Icon */}
                         {infoMessage.type === 'error' ? (
                             <Box sx={{ mr: 1 }}>
-                                {/* Error icon */}
                                 <WarningAmberIcon sx={{ color: 'error.main' }} />
                             </Box>
                         ) : (
                             <Box sx={{ mr: 1 }}>
-                                {/* Success icon */}
                                 <CheckCircleIcon sx={{ color: 'success.main' }} />
                             </Box>
                         )}
-                        {/* Message Text */}
                         <Box>
                             <strong>{infoMessage.type === 'error' ? 'Error: ' : 'Success: '}</strong>
                             {infoMessage.message}

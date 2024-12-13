@@ -12,6 +12,7 @@ import {paths} from 'src/routes/paths';
 import {UserService} from 'src/services/UserService';
 import {CampaignForm} from '../campaign-form';
 import {Iconify} from "../../../components/iconify";
+import {useRouter} from "../../../routes/hooks";
 
 // ----------------------------------------------------------------------
 
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function CampaignFormView({campaignId}: Props) {
+    const router = useRouter();
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -36,13 +38,16 @@ export function CampaignFormView({campaignId}: Props) {
         try {
             setLoading(true);
             const response = await UserService.getCampaign(campaignId);
-            if (response.status === 200) {
+            if (response.status === 200 && response.data?.[0]) {
                 setCampaign(response.data[0]);
+            } else {
+                // Campaign not found or invalid response
+                router.push(paths.campaigns.list);
             }
         } catch (error) {
             console.error('Error loading campaign:', error);
             setError('Failed to load campaign');
-            navigate(paths.campaigns.list);
+            router.push(paths.campaigns.list);
         } finally {
             setLoading(false);
         }
@@ -58,7 +63,7 @@ export function CampaignFormView({campaignId}: Props) {
                 : await UserService.createCampaign(formData);
 
             if (response.status === 200) {
-                navigate(paths.campaigns.list);
+                router.push(paths.campaigns.list);
             }
         } catch (error) {
             console.error('Error saving campaign:', error);
@@ -67,6 +72,37 @@ export function CampaignFormView({campaignId}: Props) {
             setLoading(false);
         }
     };
+
+    if (loading) {
+        return (
+            <Container maxWidth="lg">
+                <Stack spacing={3}>
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        spacing={4}
+                    >
+                        <Typography variant="h4">
+                            {isEditMode ? 'Edit Campaign' : 'New Campaign'}
+                        </Typography>
+
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<Iconify icon="eva:arrow-back-fill"/>}
+                            onClick={() => router.push(paths.campaigns.list)}
+                        >
+                            Back to campaigns
+                        </Button>
+                    </Stack>
+                    <Card sx={{p: 3, display: 'flex', justifyContent: 'center'}}>
+                        <Typography>Loading campaign...</Typography>
+                    </Card>
+                </Stack>
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="lg">
@@ -85,11 +121,10 @@ export function CampaignFormView({campaignId}: Props) {
                         variant="contained"
                         color="secondary"
                         startIcon={<Iconify icon="eva:arrow-back-fill"/>}
-                        onClick={() => navigate(paths.campaigns.list)}
+                        onClick={() => router.push(paths.campaigns.list)}
                     >
                         Back to campaigns
                     </Button>
-
                 </Stack>
 
                 {error && (

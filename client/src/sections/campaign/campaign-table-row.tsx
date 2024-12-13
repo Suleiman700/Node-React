@@ -9,6 +9,9 @@ import MenuList from '@mui/material/MenuList';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, {menuItemClasses} from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
 
 import {Label} from 'src/components/label';
 import {Iconify} from 'src/components/iconify';
@@ -32,8 +35,9 @@ type CampaignTableRowProps = {
     onRowClickEdit: () => void;
 };
 
-export function CampaignTableRow({row, selected, onRowClickEdit}: CampaignTableRowProps) {
+export function CampaignTableRow({row, selected, onRowClickEdit, onRowClickDelete}: CampaignTableRowProps) {
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+    const [copied, setCopied] = useState(false);
 
     const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
         setOpenPopover(event.currentTarget);
@@ -44,9 +48,20 @@ export function CampaignTableRow({row, selected, onRowClickEdit}: CampaignTableR
     }, []);
 
     const handleRowEdit = useCallback((id: string) => {
-        console.log(`Editing campaign with ID: ${id}`);
         onRowClickEdit(id);
     }, []);
+
+    const handleDeleteRow = useCallback((id: string) => {
+        onRowClickDelete(id);
+    }, []);
+
+    const handleCopyToken = () => {
+        if (row.token) {
+            navigator.clipboard.writeText(row.token);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
 
     return (
         <>
@@ -59,11 +74,31 @@ export function CampaignTableRow({row, selected, onRowClickEdit}: CampaignTableR
                 </TableCell>
 
                 <TableCell>
-                    {row.description}
+                    <Label color={row.platform.length? 'info':'error'}>{row.platform.length? row.platform:'-'}</Label>
                 </TableCell>
 
                 <TableCell>
-                    {row.token}
+                    {row.description.length? row.description:'-'}
+                </TableCell>
+
+                <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <span>{row.token || '-'}</span>
+                    {row.token && (
+                        <Tooltip title={copied ? "Copied!" : "Copy token"}>
+                            <IconButton 
+                                size="small" 
+                                onClick={handleCopyToken}
+                                sx={{ 
+                                    color: copied ? 'success.main' : 'text.secondary',
+                                    '&:hover': {
+                                        color: copied ? 'success.dark' : 'primary.main'
+                                    }
+                                }}
+                            >
+                                {copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </TableCell>
 
                 <TableCell>
@@ -109,7 +144,7 @@ export function CampaignTableRow({row, selected, onRowClickEdit}: CampaignTableR
                         Edit
                     </MenuItem>
 
-                    <MenuItem onClick={handleClosePopover} sx={{color: 'error.main'}}>
+                    <MenuItem onClick={() => onRowClickDelete(row.id)} sx={{color: 'error.main'}}>
                         <Iconify icon="solar:trash-bin-trash-bold"/>
                         Delete
                     </MenuItem>
