@@ -5,24 +5,33 @@ class CampaignsModel {
     static table = 'campaigns';
 
     constructor(_Campaign) {
-        const {id, user_id, name, token, active, created_at, description, platform} = _Campaign;
-        this.id = id;
-        this.user_id = user_id;
-        this.name = name;
-        this.token = token;
-        this.description = description;
-        this.platform = platform;
-        this.active = active;
-        this.created_at = created_at
+        return _Campaign;
+        // const {id, user_id, name, token, active, created_at, description, platform} = _Campaign;
+        // this.id = id;
+        // this.user_id = user_id;
+        // this.name = name;
+        // this.token = token;
+        // this.description = description;
+        // this.platform = platform;
+        // this.active = active;
+        // this.created_at = created_at
     }
 
     static async findByKeyValue(_key, _value) {
-        const [records] = await Database.connection().query(`SELECT * FROM ${CampaignsModel.table} WHERE ${_key} = ?`, [_value]);
+        const [records] = await Database.connection().query(
+            `SELECT ${CampaignsModel.table}.*, user_campaign_platforms.favicon_url 
+         FROM ${CampaignsModel.table} 
+         LEFT JOIN user_campaign_platforms 
+         ON user_campaign_platforms.name = ${CampaignsModel.table}.platform 
+         WHERE ${CampaignsModel.table}.${_key} = ?`,
+            [_value]
+        );
+
         if (records.length > 0) {
             const returnType = [];
             records.forEach(record => {
                 returnType.push(new CampaignsModel(record))
-            })
+            });
 
             return returnType;
         }
@@ -30,12 +39,20 @@ class CampaignsModel {
     }
 
     static async getCampaignByIdAndUser(_id, _userId) {
-        const [records] = await Database.connection().query(`SELECT * FROM ${CampaignsModel.table} WHERE id = ? AND user_id = ?`, [_id, _userId]);
+        const [records] = await Database.connection().query(
+            `SELECT ${CampaignsModel.table}.*, user_campaign_platforms.favicon_url 
+         FROM ${CampaignsModel.table} 
+         LEFT JOIN user_campaign_platforms 
+         ON user_campaign_platforms.name = ${CampaignsModel.table}.platform 
+         WHERE ${CampaignsModel.table}.id = ? AND ${CampaignsModel.table}.user_id = ?`,
+            [_id, _userId]
+        );
+
         if (records.length > 0) {
             const returnType = [];
             records.forEach(record => {
                 returnType.push(new CampaignsModel(record))
-            })
+            });
 
             return returnType;
         }

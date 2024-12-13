@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 
 import {paths} from 'src/routes/paths';
 import {UserService} from 'src/services/UserService';
+import {UserCampaignPlatformsService} from 'src/services/UserCampaignPlatformsService';
 import {CampaignForm} from '../campaign-form';
 import {Iconify} from "../../../components/iconify";
 import {useRouter} from "../../../routes/hooks";
@@ -26,12 +27,15 @@ export function CampaignFormView({campaignId}: Props) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [campaign, setCampaign] = useState(null);
+    const [platforms, setPlatforms] = useState(null);
     const isEditMode = !!campaignId;
+
 
     useEffect(() => {
         if (campaignId) {
             loadCampaign();
         }
+        loadCampaignPlatforms();
     }, [campaignId]);
 
     const loadCampaign = async () => {
@@ -44,14 +48,30 @@ export function CampaignFormView({campaignId}: Props) {
                 // Campaign not found or invalid response
                 router.push(paths.campaigns.list);
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error loading campaign:', error);
             setError('Failed to load campaign');
             router.push(paths.campaigns.list);
-        } finally {
+        }
+        finally {
             setLoading(false);
         }
     };
+
+    const loadCampaignPlatforms = async () => {
+        setLoading(true);
+        try {
+            setLoading(true);
+            const response = await UserCampaignPlatformsService.getPlatforms();
+            if (response.status === 200 && response.data) {
+                setPlatforms(response.data);
+            }
+        }
+        finally {
+            setLoading(false);
+        }
+    }
 
     const handleSubmit = async (formData: any) => {
         try {
@@ -65,10 +85,12 @@ export function CampaignFormView({campaignId}: Props) {
             if (response.status === 200) {
                 router.push(paths.campaigns.list);
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error saving campaign:', error);
             setError('Failed to save campaign');
-        } finally {
+        }
+        finally {
             setLoading(false);
         }
     };
@@ -136,6 +158,7 @@ export function CampaignFormView({campaignId}: Props) {
                 <Card sx={{p: 3}}>
                     <CampaignForm
                         campaign={campaign}
+                        platforms={platforms}
                         onSubmit={handleSubmit}
                         loading={loading}
                     />

@@ -67,15 +67,18 @@ class LeadModel {
         try {
             const [rows] = await Database.connection().query(
                 `
-                    SELECT
-                        leads.*,
-                        campaigns.name AS campaign_name,
-                        campaigns.platform AS campaign_platform
-                    FROM ${LeadModel.table} AS leads
-                             LEFT JOIN campaigns
-                                       ON leads.campaign_id = campaigns.id
-                    WHERE leads.${key} = ?
-                `,
+                SELECT
+                    leads.*,
+                    campaigns.name AS campaign_name,
+                    campaigns.platform AS campaign_platform,
+                    user_campaign_platforms.favicon_url AS campaign_platform_favicon_url
+                FROM ${LeadModel.table} AS leads
+                         LEFT JOIN campaigns
+                           ON leads.campaign_id = campaigns.id
+                         LEFT JOIN user_campaign_platforms
+                           ON user_campaign_platforms.name = campaigns.platform
+                WHERE leads.${key} = ?
+            `,
                 [value]
             );
 

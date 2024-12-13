@@ -7,6 +7,7 @@ const jwtDecode = require('jwt-decode');
 const CampaignService = require('./CampaignService');
 const UserModel = require('../user/userModel');
 const LeadModel = require('../lead/LeadModel');
+const UserCampaignPlatformsModel = require('../user_campaign_platforms/UserCampaignPlatformsModel');
 
 // const {adminOnly} = require('../../middleware/roleAuth');
 
@@ -75,7 +76,6 @@ router.post('/edit/:id', authenticateToken, async (req, res) => {
 
     const campaignId = req.params.id;
 
-
     try {
         // Get campaign data
         let campaignData = await CampaignsModel.findByKeyValue('id', campaignId);
@@ -93,6 +93,15 @@ router.post('/edit/:id', authenticateToken, async (req, res) => {
         // Get passed new campaign data
         const passedCampaignData = req.body;
 
+        // Remove unwanted properties from campaign data
+        delete passedCampaignData.favicon_url;
+
+        // If campaign contains platform name
+        if (passedCampaignData.platform) {
+            await UserCampaignPlatformsModel.findOrCreate(userId, passedCampaignData.platform);
+        }
+
+        // Update campaign
         const Campaign = await CampaignsModel.update(campaignData.id, passedCampaignData);
         if (Campaign != null) {
             res.json(Campaign);
@@ -127,6 +136,16 @@ router.post('/create', authenticateToken, async (req, res) => {
 
         if (!newCampaignId) {
             return res.status(400).json({ state: false, message: 'Failed to create campaign' });
+        }
+
+        // Add platform name if its new
+        const platformFound = await UserCampaignPlatformsModel.findByKeyValue('name', campaignData.platform)
+        if (platformFound == null) {
+            const platformData = {
+                user_id: userId,
+                name: campaignData.platform
+            };
+            const platformFound = UserCampaignPlatformsModel.create(platformData);
         }
 
         res.status(201).json({ id: newCampaignId, token: newToken });
@@ -170,6 +189,7 @@ router.post('/delete/:id', authenticateToken, async (req, res) => {
     }
     catch (error) {
         res.status(500).json({state: false, error: error.message});
+        return;
     }
 })
 

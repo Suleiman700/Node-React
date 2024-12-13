@@ -12,11 +12,14 @@ import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import IconButton from '@mui/material/IconButton';
+import { Iconify } from 'src/components/iconify';
 
 import { CampaignService } from "../../services/CampaignService";
 import RHFTextField from "src/components/hook-form/RHFTextField";
 import FormProvider from 'src/components/hook-form/form-provider';
 import Select from "@mui/material/Select";
+import {UserCampaignPlatformsService} from "../../services/UserCampaignPlatformsService";
 
 // import 'src/assets/styles/sweetalert.css';
 
@@ -25,21 +28,47 @@ import Select from "@mui/material/Select";
 const Schema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     active: Yup.string().required('Active state is required'),
+    platform: Yup.string().when(['id', 'isAddingNewPlatform'], {
+        is: (platform_id: string, isAddingNewPlatform: boolean) => !platform_id && isAddingNewPlatform,
+        then: () => Yup.string().required('Platform is required'),
+        otherwise: () => Yup.string()
+    }),
+    platform_id: Yup.string().when(['platform', 'isAddingNewPlatform'], {
+        is: (platform: string, isAddingNewPlatform: boolean) => !platform && !isAddingNewPlatform,
+        then: () => Yup.string().required('Platform is required'),
+        otherwise: () => Yup.string()
+    }),
 });
 
 // ----------------------------------------------------------------------
 
 type Props = {
     campaign?: any;
+    platforms?: any;
     onSubmit: (data: any) => void;
     loading?: boolean;
+    onPlatformDelete: (platformId: string) => Promise<void>;
 };
 
-export function CampaignForm({ campaign, onSubmit, loading }: Props) {
+export function CampaignForm({ campaign, onSubmit, platforms: initialPlatforms, loading, onPlatformDelete }: Props) {
     const [infoMessage, setInfoMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [isAddingNewPlatform, setIsAddingNewPlatform] = useState(false);
+    const [platforms, setPlatforms] = useState(initialPlatforms);
+
+    useEffect(() => {
+        setPlatforms(initialPlatforms);
+    }, [initialPlatforms]);
 
     const methods = useForm({
         resolver: yupResolver(Schema),
+        defaultValues: {
+            name: '',
+            active: '1',
+            platform: '',
+            platform: '',
+            isAddingNewPlatform: false
+        },
+        context: { isAddingNewPlatform }
     });
 
     const {
@@ -133,13 +162,61 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
                 }
             }
         } catch (error) {
-            console.log(error);
             setInfoMessage({
                 type: 'error',
                 message: 'Unexpected error occurred. Please try again later.',
             });
         }
     });
+
+    const handlePlatformDelete = async (platformId: number, event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent select from opening
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to delete this platform",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await UserCampaignPlatformsService.delete(platformId);
+
+                if (response && response.status === 200) {
+                    setPlatforms(prevPlatforms => prevPlatforms.filter(platform => platform.id !== platformId));
+                    
+                    await Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Platform has been deleted.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal2-popup',
+                            title: 'swal2-title'
+                        }
+                    });
+                } else {
+                    throw new Error('Failed to delete platform');
+                }
+            } catch (error) {
+                await Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to delete platform.',
+                    icon: 'error',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: 'swal2-popup',
+                        title: 'swal2-title'
+                    }
+                });
+            }
+        }
+    };
 
     useEffect(() => {
         if (infoMessage) {
@@ -153,8 +230,82 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
 
     return (
         <FormProvider methods={methods} onSubmit={onSubmitForm}>
-            <Stack spacing={3}>
+            <Stack spacing={3} sx={{ p: 3 }}>
                 <RHFTextField name="name" label="Campaign Name" />
+
+                <Box>
+                    {platforms && platforms.length > 0 && (
+                        <Button
+                            variant="text"
+                            onClick={() => setIsAddingNewPlatform(!isAddingNewPlatform)}
+                            sx={{ mb: 2 }}
+                        >
+                            {isAddingNewPlatform ? '← Select Existing Platform' : '+ Add New Platform'}
+                        </Button>
+                    )}
+
+                    {(platforms && platforms.length > 0 && !isAddingNewPlatform) ? (
+                        <Controller
+                            name="platform"
+                            control={control}
+                            render={({ field, fieldState: { error } }) => (
+                                <Box>
+                                    <Select
+                                        {...field}
+                                        fullWidth
+                                        displayEmpty
+                                        error={!!error}
+                                    >
+                                        <MenuItem value="" disabled>
+                                            <em>Select Platform</em>
+                                        </MenuItem>
+                                        {platforms.map((platform: any) => (
+                                            <MenuItem 
+                                                key={platform.id} 
+                                                value={platform.name}
+                                                sx={{ 
+                                                    display: 'flex', 
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                {platform.name}
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={(e) => handlePlatformDelete(platform.id, e)}
+                                                    sx={{
+                                                        ml: 2,
+                                                        '&:hover': {
+                                                            color: 'error.main'
+                                                        }
+                                                    }}
+                                                >
+                                                    <Iconify icon="eva:trash-2-outline" />
+                                                </IconButton>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    {error && (
+                                        <FormHelperText error>
+                                            {error.message}
+                                        </FormHelperText>
+                                    )}
+                                </Box>
+                            )}
+                        />
+                    ) : (
+                        <Box>
+                            <RHFTextField 
+                                name="platform" 
+                                label="Campaign Platform" 
+                            />
+                            <FormHelperText sx={{ px: 2, color: 'gray' }}>
+                                Enter platform name (e.g., Facebook, TikTok, Instagram)
+                            </FormHelperText>
+                        </Box>
+                    )}
+                </Box>
+
                 <RHFTextField 
                     name="token" 
                     label="Campaign Token" 
@@ -162,12 +313,6 @@ export function CampaignForm({ campaign, onSubmit, loading }: Props) {
                     value={campaign ? campaign.token : 'Will be generated upon creating campaign'} 
                 />
                 <RHFTextField name="description" label="Description" multiline rows={4} />
-                <Box>
-                    <RHFTextField name="platform" label="Campaign Platform" />
-                    <FormHelperText sx={{ px: 2, color: 'gray' }}>
-                        Campaign platform like Facebook, TikTok, Instagram, etc.
-                    </FormHelperText>
-                </Box>
                 <Controller
                     name="active"
                     control={control}

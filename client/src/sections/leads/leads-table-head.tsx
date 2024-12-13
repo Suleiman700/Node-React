@@ -5,32 +5,47 @@ import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
-import { visuallyHidden } from './utils';
+import { visuallyHidden } from '@mui/utils';
 
 // ----------------------------------------------------------------------
 
-type LeadsTableHeadProps = {
-  orderBy: string;
-  rowCount: number;
-  numSelected: number;
+type Props = {
   order: 'asc' | 'desc';
-  onSort: (id: string) => void;
-  headLabel: Record<string, any>[];
-  onSelectAllRows: (checked: boolean) => void;
+  orderBy: string;
+  headLabel: any[];
+  onRequestSort: (id: string) => void;
+  numSelected: number;
+  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  rowCount: number;
 };
 
 export function LeadsTableHead({
   order,
-  onSort,
   orderBy,
-  rowCount,
   headLabel,
+  onRequestSort,
   numSelected,
-  onSelectAllRows,
-}: LeadsTableHeadProps) {
+  onSelectAllClick,
+  rowCount,
+}: Props) {
+  const createSortHandler = (id: string) => (event: React.MouseEvent<unknown>) => {
+    onRequestSort(id);
+  };
+
   return (
     <TableHead>
       <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all leads',
+            }}
+          />
+        </TableCell>
+
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -42,7 +57,7 @@ export function LeadsTableHead({
               hideSortIcon
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={() => onSort(headCell.id)}
+              onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
               {orderBy === headCell.id ? (

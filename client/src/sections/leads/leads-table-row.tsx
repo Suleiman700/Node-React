@@ -13,11 +13,15 @@ import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import ListItemText from '@mui/material/ListItemText';
 
 import {Label} from 'src/components/label';
 import {Iconify} from 'src/components/iconify';
 import {fDateTime} from "../../utils/format-time";
 import Swal from 'sweetalert2';
+import {Image, ImageAspectRatioRounded} from "@mui/icons-material";
 
 // ----------------------------------------------------------------------
 
@@ -33,12 +37,14 @@ export type LeadsProps = {
 
 type LeadsTableRowProps = {
     row: LeadsProps;
-    index: number; // Add the index
+    index: number; 
     selected: boolean;
+    onSelect: () => void;
     onRowClickEdit: () => void;
+    onRowClickDelete: () => void;
 };
 
-export function LeadsTableRow({row, index, selected, onRowClickEdit, onRowClickDelete}: LeadsTableRowProps) {
+export function LeadsTableRow({row, index, selected, onSelect, onRowClickEdit, onRowClickDelete}: LeadsTableRowProps) {
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
     const [copied, setCopied] = useState(false);
 
@@ -69,10 +75,20 @@ export function LeadsTableRow({row, index, selected, onRowClickEdit, onRowClickD
     return (
         <>
             <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
+                <TableCell padding="checkbox">
+                    <Checkbox 
+                        checked={selected} 
+                        onChange={onSelect}
+                        inputProps={{
+                            'aria-label': `select lead ${row.id}`,
+                        }}
+                    />
+                </TableCell>
+
                 <TableCell component="th" scope="row">
                     <Box gap={2} display="flex" alignItems="center">
                         <Avatar alt={row.name} src='assets/icons/navbar/ic-user.png' />
-                        {index + 1} {/* Add 1 if you want the index to start from 1 instead of 0 */}
+                        {index + 1} 
                     </Box>
                 </TableCell>
 
@@ -81,7 +97,22 @@ export function LeadsTableRow({row, index, selected, onRowClickEdit, onRowClickD
                 </TableCell>
 
                 <TableCell>
-                    <Label color={row.campaign_platform.length? 'info':'error'}>{row.campaign_platform.length? row.campaign_platform:'-'}</Label>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        {row.campaign_platform_favicon_url && (
+                            <Avatar
+                                src={row.campaign_platform_favicon_url}
+                                alt={row.campaign_platform}
+                                sx={{ 
+                                    width: 20, 
+                                    height: 20,
+                                    marginRight: 1
+                                }}
+                            />
+                        )}
+                        <Label color={row.campaign_platform && row.campaign_platform.length ? 'info' : 'error'}>
+                            {row.campaign_platform && row.campaign_platform.length ? row.campaign_platform : '-'}
+                        </Label>
+                    </Stack>
                 </TableCell>
 
                 <TableCell>

@@ -16,6 +16,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import {Label} from 'src/components/label';
 import {Iconify} from 'src/components/iconify';
 import {fDateTime} from "../../utils/format-time";
+import Stack from "@mui/material/Stack";
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +75,21 @@ export function CampaignTableRow({row, selected, onRowClickEdit, onRowClickDelet
                 </TableCell>
 
                 <TableCell>
-                    <Label color={row.platform.length? 'info':'error'}>{row.platform.length? row.platform:'-'}</Label>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        {row.favicon_url && (
+                            <Avatar
+                                src={row.favicon_url}
+                                alt={row.platform}
+                                sx={{
+                                    width: 20,
+                                    height: 20,
+                                    marginRight: 1
+                                }}
+                            />
+                        )}
+                        <Label color={row.platform.length? 'info':'error'}>{row.platform.length? row.platform:'-'}</Label>
+                    </Stack>
+
                 </TableCell>
 
                 <TableCell>

@@ -19,6 +19,11 @@ export const API_ROUTES_CAMPAIGNS = {
     DELETE: `${API_ROUTES.BASE}/campaigns/delete`,
 };
 
+export const API_ROUTES_USER_CAMPAIGN_PLATFORMS = {
+    PLATFORMS: `${API_ROUTES.BASE}/user-campaign-platforms`,
+    DELETE: `${API_ROUTES.BASE}/user-campaign-platforms/delete`,
+};
+
 // User data interface
 interface UserData {
     id: string;
