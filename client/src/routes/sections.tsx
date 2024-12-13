@@ -16,6 +16,7 @@ export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const CampaignsPage = lazy(() => import('src/pages/campaigns'));
 export const CampaignFormPage = lazy(() => import('src/pages/campaign-form'));
+export const LeadsPage = lazy(() => import('src/pages/leads'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const AdminSignInPage = lazy(() => import('src/pages/admin/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
@@ -75,6 +76,7 @@ export function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'campaigns', element: <CampaignsPage /> },
         { path: 'campaigns/new', element: <CampaignFormPage /> },
+        { path: 'leads', element: <LeadsPage /> },
         { path: 'campaigns/edit/:id', element: <CampaignFormPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },

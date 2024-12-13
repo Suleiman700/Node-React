@@ -9,6 +9,7 @@ export const API_ROUTES_USER = {
     GET_ME: `${API_ROUTES.BASE}/user/me`,
     GET_CAMPAIGNS: `${API_ROUTES.BASE}/user/campaigns`,
     GET_CAMPAIGN: `${API_ROUTES.BASE}/user/campaign`,
+    GET_LEADS: `${API_ROUTES.BASE}/user/leads`,
 };
 
 export const API_ROUTES_CAMPAIGNS = {

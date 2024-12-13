@@ -14,5 +14,10 @@ export class UserService {
         const response = await RequestHandler.get(`${API_ROUTES_CAMPAIGNS.CAMPAIGNS}/${_campaignId}`);
         return response;
     }
+
+    public static async getLeads(_params: object = {}) {
+        const response = await RequestHandler.get(`${API_ROUTES_USER.GET_LEADS}`, _params);
+        return response;
+    }
 }
 

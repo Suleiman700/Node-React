@@ -9,14 +9,18 @@ class RequestHandler {
         return LocalStorage.getItem(LOCAL_STORAGE_KEYS.JWT.TOKEN);
     }
 
-    public static async get(endpoint: string): Promise<any> {
+    public static async get(endpoint: string, params: object = {}): Promise<any> {
         const token = RequestHandler.getToken();
         const headers = new Headers({
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         });
 
-        const response = await fetch(endpoint, {
+        // Convert params object to query string
+        const queryString = new URLSearchParams(params as Record<string, string>).toString();
+        const urlWithParams = queryString ? `${endpoint}?${queryString}` : endpoint;
+
+        const response = await fetch(urlWithParams, {
             method: 'GET',
             headers: headers,
         });
@@ -24,7 +28,7 @@ class RequestHandler {
         const result = {
             status: response.status,
             data: await response.json(),
-        }
+        };
 
         return result;
     }

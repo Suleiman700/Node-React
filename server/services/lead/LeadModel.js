@@ -5,10 +5,7 @@ class LeadModel {
     static table = 'leads';
 
     constructor(_Lead) {
-        const {id, campaign_id, data} = _Lead;
-        this.id = id;
-        this.campaign_id = campaign_id;
-        this.data = data;
+        return _Lead;
     }
 
     /**
@@ -64,17 +61,36 @@ class LeadModel {
      * Find leads by a specific key-value pair
      * @param {string} key - The column name
      * @param {any} value - The value to search for
-     * @returns {Promise<Array>} Array of found leads
+     * @returns {Promise<Array<LeadModel>>} Array of LeadModel instances
      */
     static async findByKeyValue(key, value) {
-        const [rows] = await Database.connection().query(
-            `SELECT * FROM ${LeadModel.table} WHERE ${key} = ?`,
-            [value]
-        );
-        return rows.map(row => ({
-            ...row,
-            data: JSON.parse(row.data) // Parse the JSON data field
-        }));
+        try {
+            const [rows] = await Database.connection().query(
+                `
+                    SELECT
+                        leads.*,
+                        campaigns.name AS campaign_name,
+                        campaigns.platform AS campaign_platform
+                    FROM ${LeadModel.table} AS leads
+                             LEFT JOIN campaigns
+                                       ON leads.campaign_id = campaigns.id
+                    WHERE leads.${key} = ?
+                `,
+                [value]
+            );
+
+            if (rows.length) {
+                // Convert rows to instances of LeadModel
+                return rows.map(row => new LeadModel(row));
+            }
+            else {
+                return null;
+            }
+        }
+        catch (error) {
+            // console.error('Error finding leads by key-value:', error);
+            throw null;
+        }
     }
 }
 

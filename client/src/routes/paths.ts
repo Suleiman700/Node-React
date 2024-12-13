@@ -23,4 +23,11 @@ export const paths = {
         edit: (id: string) => path(ROOTS.DASHBOARD, `campaigns/edit/${id}`),
         view: (id: string) => path(ROOTS.DASHBOARD, `campaigns/${id}`),
     },
+    leads: {
+        root: path(ROOTS.DASHBOARD, 'leads'),
+        list: path(ROOTS.DASHBOARD, 'leads'),
+        new: path(ROOTS.DASHBOARD, 'leads/new'),
+        edit: (id: string) => path(ROOTS.DASHBOARD, `leads/edit/${id}`),
+        view: (id: string) => path(ROOTS.DASHBOARD, `leads/${id}`),
+    },
 } as const;

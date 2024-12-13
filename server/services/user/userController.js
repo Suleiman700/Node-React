@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserModel = require('./userModel');
+const LeadsModel = require('../lead/LeadModel');
 const CampaignsModel = require('../campaigns/campaignsModel');
 const config = require('../../config');
 const Hash = require('../../utils/Hash');
@@ -75,5 +76,40 @@ router.get('/me', authenticateToken, async (req, res) => {
         res.status(500).json({state: false, error: error.message});
     }
 })
+
+/**
+ * Get user leads
+ *
+ * Available params:
+ * - returnType {string} count|all - The return type of the data
+ */
+router.get('/leads', authenticateToken, async (req, res) => {
+
+    try {
+        const token = req.headers['authorization'].split(' ')[1];
+        const userId = jwtDecode.jwtDecode(token).id;
+
+        // Extract the `returnType` parameter from the query
+        const { returnType = 'all' } = req.query; // Default to 'all' if not provided
+
+        const Leads = await LeadsModel.findByKeyValue('user_id', userId);
+        if (Leads != null) {
+            // Handle `returnType`
+            if (returnType === 'count') {
+                return res.status(200).json({ count: Leads.length });
+            }
+            else {
+                res.status(200).json(Leads);
+            }
+        }
+        else {
+            res.status(404).json({message: 'No user found'});
+        }
+    }
+    catch (error) {
+        res.status(500).json({state: false, error: error.message});
+    }
+})
+
 
 module.exports = router;
